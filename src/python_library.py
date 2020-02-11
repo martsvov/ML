@@ -21,16 +21,33 @@ import pandas as pd
 #                   index=ind,
 #                   columns=['data1', 'data2'])
 
-index = pd.MultiIndex.from_product([[2013, 2014], [1, 2]],
-                                   names=['year', 'visit'])
-columns = pd.MultiIndex.from_product([['Bob', 'Guido', 'Sue'],
-                                      ['HR', 'Temp']],
-                                     names=['subject', 'type'])
+# index = pd.MultiIndex.from_product([[2013, 2014], [1, 2]],
+#                                    names=['year', 'visit'])
+# columns = pd.MultiIndex.from_product([['Bob', 'Guido', 'Sue'],
+#                                       ['HR', 'Temp']],
+#                                      names=['subject', 'type'])
+#
+# data = np.round(np.random.randn(4, 6), 1)
+# data[:, ::2] *= 10
+# data += 37
+#
+# health_data = pd.DataFrame(data, index=index, columns=columns)
 
-data = np.round(np.random.randn(4, 6), 1)
-data[:, ::2] *= 10
-data += 37
 
-health_data = pd.DataFrame(data, index=index, columns=columns)
+# def make_df(cols, ind):
+#     data = {c: [str(c) + str(i) for i in ind] for c in cols}
+#     return pd.DataFrame(data, ind)
+#
+#
+# df1 = make_df('ABC', [1, 2])
+# df2 = make_df('BCD', [3, 4])
+# df3 = pd.concat([df1, df2], join='inner')
 
-print(health_data)
+df1 = pd.DataFrame({'employee': ['Bob', 'Jake', 'Lisa', 'Sue'],
+                    'group': ['Accounting', 'Engineering', 'Engineering',
+                              'HR']})
+df2 = pd.DataFrame({'employee': ['Lisa', 'Bob', 'Jake', 'Sue'],
+                    'hire_date': [2004, 2008, 2012, 2014]})
+
+df3 = pd.merge(df1, df2)
+print(df3)
