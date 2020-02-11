@@ -1,12 +1,12 @@
 import numpy as np
-import array
+import matplotlib.pyplot as plt
+import seaborn
 
-a = np.arange(1, 9)
-b = np.ones((2, 3))
+seaborn.set()
 
 
-print(a)
-# print(np.std(a))
-# print(np.var(a))
-# print(np.median(a))
-# print(np.percentile(a, q=50))
+rand = np.random.RandomState(42)
+X = rand.rand(10, 2)
+
+plt.scatter(X[:, 0], X[:, 1], s=100)
+plt.show()
