@@ -2,15 +2,17 @@ import os
 import tarfile
 import numpy as np
 import pandas as pd
+from pandas.plotting import scatter_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
 import hashlib
 import matplotlib.pyplot as plt
 from six.moves import urllib
 
 DOWNLOAD_ROOT = "https://raw.githubusercontent.com/ageron/handson-ml/master/"
 HOUSING_PATH = os.path.join("..\datasets", "housing")
-
 HOUSING_URL = DOWNLOAD_ROOT + "datasets/housing/housing.tgz"
 
 
@@ -52,7 +54,6 @@ def split_train_test_by_id(data, test_ratio, id_column,
 fetch_housing_data(HOUSING_URL, HOUSING_PATH)
 df = load_housing_data(HOUSING_PATH)
 # df.hist(bins=50, figsize=(20, 15))
-# plt.show()
 
 # df_with_id = df.reset_index()
 # train_set, test_set = split_train_test(df, 0.2)
@@ -73,13 +74,74 @@ for train_index, test_index in split.split(df, df['income_cat']):
 
 # train_set, test_set = train_test_split(df, test_size=0.2, random_state=42)
 
-housing = strat_train_set.copy()
+# housing = strat_train_set.copy()
 # housing.plot(kind='scatter', x='longitude', y='latitude', alpha=0.1)
-housing.plot(kind='scatter', x='longitude', y='latitude', alpha=0.4,
-             s=housing['population'] / 100, label='population',
-             figsize=(10, 7), c='median_house_value',
-             cmap=plt.get_cmap('jet'), colorbar=True,
-             )
+# housing.plot(kind='scatter', x='longitude', y='latitude', alpha=0.4,
+#              s=housing['population'] / 100, label='population',
+#              figsize=(10, 7), c='median_house_value',
+#              cmap=plt.get_cmap('jet'), colorbar=True,
+#              )
 
-plt.legend()
-plt.show()
+# plt.legend()
+
+# attributes = ["median_house_value", "median_income", "total_rooms", "housing_median_age"]
+# scatter_matrix(housing[attributes], figsize=(12, 8))
+
+# housing.plot(kind="scatter", x="median_income", y="median_house_value", alpha=0.1)
+
+# housing["rooms_per_household"] = housing["total_rooms"] / housing["households"]
+# housing["bedrooms_per_room"] = housing["total_bedrooms"] / housing["total_rooms"]
+# housing["population_per_household"] = housing["population"] / housing["households"]
+
+# corr_matrix = housing.corr()
+# corr_matrix["median_house_value"].sort_values(ascending=False)
+# plt.show()
+
+housing = strat_train_set.drop("median_house_value", axis=1)
+housing_labels = strat_train_set["median_house_value"].copy()
+housing_num = housing.drop("ocean_proximity", axis=1)
+
+imputer = SimpleImputer(strategy="median")
+imputer.fit(housing_num)
+
+X = imputer.transform(housing_num)
+housing_tr = pd.DataFrame(X, columns=housing_num.columns)
+
+housing_cat = housing["ocean_proximity"]
+housing_cat_encoded, housing_categories = housing_cat.factorize()
+
+encoder = OneHotEncoder()
+housing_cat_hot = encoder.fit_transform(housing_cat_encoded.reshape(-1, 1))
+
+from sklearn.base import BaseEstimator, TransformerMixin
+rooms_ix, bedrooms_ix, population_ix, household_ix = 3 , 4 , 5 , 6
+
+
+class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
+    def __init__(self, add_bedrooms_per_room = True):
+        self.add_bedrooms_per_room = add_bedrooms_per_room
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, Х, y=None):
+        rooms_per_household = Х[:, rooms_ix]/Х[:, household_ix]
+        population_per_household = Х[:, population_ix]/Х[:, household_ix]
+        if self.add_bedrooms_per_room:
+            bedrooms_per_room = Х[:, bedrooms_ix]/Х[:, rooms_ix]
+            return np.c_[X, rooms_per_household, population_per_household, bedrooms_per_room]
+        else:
+            return np.c_[X, rooms_per_household, population_per_household]
+
+
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+num_pipeline = Pipeline([
+    ('imputer', SimpleImputer(strategy="median")),
+    ('attribs_adder', CombinedAttributesAdder()),
+    ('std_scaler', StandardScaler()),
+])
+housing_num_tr = num_pipeline.fit_transform(housing_num)
+
+print(housing_num_tr)
