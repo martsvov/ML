@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-# import matplotlib.pyplot as plt
-# import seaborn
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # index = [('California', 2000), ('California', 2010),
 #          ('New York', 2000), ('New York', 2010),
@@ -43,11 +43,64 @@ import pandas as pd
 # df2 = make_df('BCD', [3, 4])
 # df3 = pd.concat([df1, df2], join='inner')
 
-df1 = pd.DataFrame({'employee': ['Bob', 'Jake', 'Lisa', 'Sue'],
-                    'group': ['Accounting', 'Engineering', 'Engineering',
-                              'HR']})
-df2 = pd.DataFrame({'employee': ['Lisa', 'Bob', 'Jake', 'Sue'],
-                    'hire_date': [2004, 2008, 2012, 2014]})
+# df1 = pd.DataFrame({'employee': ['Bob', 'Jake', 'Lisa', 'Sue'],
+#                     'group': ['Accounting', 'Engineering', 'Engineering',
+#                               'HR']})
+# df2 = pd.DataFrame({'employee': ['Lisa', 'Bob', 'Jake', 'Sue'],
+#                     'hire_date': [2004, 2008, 2012, 2014]})
+#
+# df3 = pd.merge(df1, df2)
 
-df3 = pd.merge(df1, df2)
-print(df3)
+# pop = pd.read_csv('../data/state-population.csv')
+# areas = pd.read_csv('../data/state-areas.csv')
+# abbrevs = pd.read_csv('../data/state-abbrevs.csv')
+#
+# merged = pd.merge(pop, abbrevs, how='outer', left_on='state/region', right_on='abbreviation')
+# merged = merged.drop('abbreviation', 1)
+#
+# merged.loc[merged['state/region'] == 'PR', 'state'] = 'Puerto Rico'
+# merged.loc[merged['state/region'] == 'USA', 'state'] = 'United States'
+#
+# final = pd.merge(merged, areas, on='state', how='left')
+# uniq = merged.loc[merged['state'].isnull(), 'state/region'].unique()
+
+# planets = sns.load_dataset('planets')
+
+# df = planets.groupby('method')['year'].describe().unstack()
+
+# rng = np.random.RandomState(0)
+# df = pd.DataFrame({'key': ['A', 'B', 'C', 'A', 'B', 'C'],
+#                    'data1': range(6),
+#                    'data2': rng.randint(0, 10, 6)},
+#                   columns=['key', 'data1', 'data2'])
+# df_agr = df.groupby('key').transform(lambda x: x - x.mean())
+#
+#
+# def norm_by_data2(x):
+#     x['data1'] /= x['data2'].sum()
+#     return x
+
+# decade = 10 * (planets['year'] // 10)
+# decade_s = decade.astype(str) + 's'
+#
+# decade_gr = planets.groupby(['method', decade_s])['number'].sum().unstack().fillna(0)
+
+# titanic = sns.load_dataset('titanic')
+#
+# age = pd.cut(titanic['age'], [0, 18, 80])
+# pt = titanic.pivot_table('survived', ['sex', age], 'class')
+
+sns.set()
+
+births = pd.read_csv('../data/births.csv')
+births['decade'] = 10 * (births['year'] // 10)
+pt = births.pivot_table('births', index='decade', columns='gender', aggfunc='sum').plot()
+
+plt.ylabel('total births per year')
+plt.show()
+
+quartiles = np.percentile(births['births'], [25, 50, 75])
+mu = quartiles[1]
+sig = 0.74 * (quartiles[2] - quartiles[0])
+
+# print(pt)
