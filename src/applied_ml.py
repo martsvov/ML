@@ -100,48 +100,92 @@ for train_index, test_index in split.split(df, df['income_cat']):
 housing = strat_train_set.drop("median_house_value", axis=1)
 housing_labels = strat_train_set["median_house_value"].copy()
 housing_num = housing.drop("ocean_proximity", axis=1)
+#
+# imputer = SimpleImputer(strategy="median")
+# imputer.fit(housing_num)
 
-imputer = SimpleImputer(strategy="median")
-imputer.fit(housing_num)
+# X = imputer.transform(housing_num)
+# housing_transform = pd.DataFrame(X, columns=housing_num.columns)
 
-X = imputer.transform(housing_num)
-housing_tr = pd.DataFrame(X, columns=housing_num.columns)
-
-housing_cat = housing["ocean_proximity"]
-housing_cat_encoded, housing_categories = housing_cat.factorize()
-
-encoder = OneHotEncoder()
-housing_cat_hot = encoder.fit_transform(housing_cat_encoded.reshape(-1, 1))
+# housing_cat = housing["ocean_proximity"]
+# housing_cat_encoded, housing_categories = housing_cat.factorize()
+#
+# encoder = OneHotEncoder()
+# housing_cat_hot = encoder.fit_transform(housing_cat_encoded.reshape(-1, 1))
 
 from sklearn.base import BaseEstimator, TransformerMixin
-rooms_ix, bedrooms_ix, population_ix, household_ix = 3 , 4 , 5 , 6
+
+rooms_ix, bedrooms_ix, population_ix, household_ix = 3, 4, 5, 6
 
 
 class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
-    def __init__(self, add_bedrooms_per_room = True):
+    def __init__(self, add_bedrooms_per_room=True):
         self.add_bedrooms_per_room = add_bedrooms_per_room
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, Х, y=None):
-        rooms_per_household = Х[:, rooms_ix]/Х[:, household_ix]
-        population_per_household = Х[:, population_ix]/Х[:, household_ix]
+        rooms_per_household = Х[:, rooms_ix] / Х[:, household_ix]
+        population_per_household = Х[:, population_ix] / Х[:, household_ix]
         if self.add_bedrooms_per_room:
-            bedrooms_per_room = Х[:, bedrooms_ix]/Х[:, rooms_ix]
-            return np.c_[X, rooms_per_household, population_per_household, bedrooms_per_room]
+            bedrooms_per_room = Х[:, bedrooms_ix] / Х[:, rooms_ix]
+            return np.c_[Х, rooms_per_household, population_per_household, bedrooms_per_room]
         else:
-            return np.c_[X, rooms_per_household, population_per_household]
+            return np.c_[Х, rooms_per_household, population_per_household]
 
 
-from sklearn.pipeline import Pipeline
+class DataFrameSelector(BaseEstimator, TransformerMixin):
+    def __init__(self, attribute_names):
+        self.attribute_names = attribute_names
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return X[self.attribute_names].values
+
+
+from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.preprocessing import StandardScaler
 
+# num_attribs = slice(0, -1)
+# cat_attribs = slice(-1)
+
+num_attribs = list(housing_num)
+cat_attribs = ["ocean_proximity"]
+
 num_pipeline = Pipeline([
+    ('selector', DataFrameSelector(num_attribs)),
     ('imputer', SimpleImputer(strategy="median")),
     ('attribs_adder', CombinedAttributesAdder()),
     ('std_scaler', StandardScaler()),
 ])
-housing_num_tr = num_pipeline.fit_transform(housing_num)
+cat_pipeline = Pipeline([
+    ('selector', DataFrameSelector(cat_attribs)),
+    ('cat_encoder', OneHotEncoder()),
+])
 
-print(housing_num_tr)
+full_pipeline = FeatureUnion(transformer_list=[
+    ("num_pipeline", num_pipeline),
+    ("cat_pipeline", cat_pipeline),
+])
+
+housing_prepared = full_pipeline.fit_transform(housing)
+
+from sklearn.linear_model import LinearRegression
+
+lin_reg = LinearRegression()
+lin_reg.fit(housing_prepared, housing_labels)
+
+some_data = housing.iloc[:5]
+some_labels = housing_labels.iloc[:5]
+some_data_prepared = full_pipeline.transform(some_data)
+
+from sklearn.metrics import mean_squared_error
+
+housing_predictions = lin_reg.predict(housing_prepared)
+lin_mse = mean_squared_error(housing_labels, housing_predictions)
+lin_rmse = np.sqrt(lin_mse)
+
+print(lin_rmse)
