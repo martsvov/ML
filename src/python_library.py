@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import re
 
 # index = [('California', 2000), ('California', 2010),
 #          ('New York', 2000), ('New York', 2010),
@@ -94,13 +95,44 @@ sns.set()
 
 births = pd.read_csv('../data/births.csv')
 births['decade'] = 10 * (births['year'] // 10)
-pt = births.pivot_table('births', index='decade', columns='gender', aggfunc='sum').plot()
+# pt = births.pivot_table('births', index='decade', columns='gender', aggfunc='sum').plot()
+#
+# plt.ylabel('total births per year')
+# plt.show()
 
-plt.ylabel('total births per year')
-plt.show()
+# quartiles = np.percentile(births['births'], [25, 50, 75])
+# mu = quartiles[1]
+# sig = 0.74 * (quartiles[2] - quartiles[0])
+#
+# births = births.query('(births > @mu - 5 * @sig) & (births < @mu + 5 * @sig)')
+# births['day'] = births['day'].astype(int)
+# births.index = pd.to_datetime(10000 * births.year + 100 * births.month + births.day, format='%Y%m%d')
+# births['dayofweek'] = births.index.dayofweek
 
-quartiles = np.percentile(births['births'], [25, 50, 75])
-mu = quartiles[1]
-sig = 0.74 * (quartiles[2] - quartiles[0])
+# births.pivot_table('births', index='dayofweek',
+#                    columns='decade', aggfunc='mean').plot()
+# plt.gca().set_xticklabels([' ', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'])
+# plt.ylabel('mean births by day')
 
-# print(pt)
+# births_by_date = births.pivot_table('births', [births.index.month, births.index.day])
+# births_by_date.index = [pd.datetime(2012, month, day) for (month, day) in births_by_date.index]
+#
+# fig, ax = plt.subplots(figsize=(12, 4))
+# births_by_date.plot(ax=ax)
+# plt.show()
+
+# monte = pd.Series(['Graham Chapman', 'John Cleese', 'Terry Gilliam', 'Eric Idle', 'Terry Jones', 'Michael Palin'])
+# monte.str.findall(r'^[^AEIOU]*.*[^aeiou]$')
+
+# with open('../data/recipeitems-latest.json', 'r') as f:
+#     data = (line.strip() for line in f)
+#     data_json = "[{0}]".format(','.join(data))
+# recipes = pd.read_json(data_json)
+#
+# spice_list = ['salt', 'pepper', 'oregano', 'sage', 'parsley', 'rosemary', 'tarragon', 'thyme', 'paprika', 'cumin']
+# spice_df = pd.DataFrame(dict((spice, recipes.ingredients.str.contains(spice, re.IGNORECASE)) for spice in spice_list))
+
+index = pd.DatetimeIndex(['2014-07-04', '2014-08-04', '2015-07-04', '2015-08-04'])
+data = pd.Series([0, 1, 2, 3], index=index)
+
+print(data)
