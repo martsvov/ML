@@ -4,6 +4,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.datasets import fetch_openml
 from sklearn.linear_model import SGDClassifier
+from sklearn.model_selection import StratifiedKFold
+from sklearn.base import clone
+
 
 mnist = fetch_openml('mnist_784')
 Х, у = mnist["data"], mnist["target"]
@@ -27,4 +30,16 @@ sgd_clf.fit(X_train, y_train_9)
 
 res = sgd_clf.predict([some_digit])
 
-print(res)
+skfolds = StratifiedKFold(n_splits=3, random_state=42)
+for train_index, test_index in skfolds.split(X_train, y_train_9):
+    clone_clf = clone(sgd_clf)
+    X_train_folds = X_train[train_index]
+    y_train_folds = y_train_9[train_index]
+    X_test_fold = X_train[test_index]
+    y_test_fold = y_train_9[test_index]
+    clone_clf.fit(X_train_folds, y_train_folds)
+    y_pred = clone_clf.predict(X_test_fold)
+    n_correct = sum(y_pred == y_test_fold)
+    print(n_correct/len(y_pred))
+
+print()
