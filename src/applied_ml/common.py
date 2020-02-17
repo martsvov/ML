@@ -174,18 +174,39 @@ full_pipeline = FeatureUnion(transformer_list=[
 housing_prepared = full_pipeline.fit_transform(housing)
 
 from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import cross_val_score
 
 lin_reg = LinearRegression()
 lin_reg.fit(housing_prepared, housing_labels)
 
-some_data = housing.iloc[:5]
-some_labels = housing_labels.iloc[:5]
-some_data_prepared = full_pipeline.transform(some_data)
+# some_data = housing.iloc[:5]
+# some_labels = housing_labels.iloc[:5]
+# some_data_prepared = full_pipeline.transform(some_data)
+#
+# housing_predictions = lin_reg.predict(housing_prepared)
+# lin_mse = mean_squared_error(housing_labels, housing_predictions)
+# lin_rmse = np.sqrt(lin_mse)
 
-from sklearn.metrics import mean_squared_error
+tree_reg = DecisionTreeRegressor()
+tree_reg.fit(housing_prepared, housing_labels)
 
-housing_predictions = lin_reg.predict(housing_prepared)
+housing_predictions = tree_reg.predict(housing_prepared)
 lin_mse = mean_squared_error(housing_labels, housing_predictions)
 lin_rmse = np.sqrt(lin_mse)
 
-print(lin_rmse)
+scores = cross_val_score(tree_reg, housing_prepared, housing_labels,
+                         scoring="neg_mean_squared_error", cv=10)
+tree_rmse_scores = np.sqrt(-scores)
+
+
+def display_scores(scores):
+    print("Суммы оценок: " , scores)
+    print("Cpeднee: " , scores.mean())
+    print("Стандартное отклонение: ", scores.std())
+
+
+display_scores(tree_rmse_scores)
+
+print()
