@@ -62,11 +62,11 @@ session = tf.compat.v1.Session(config=config)
 # decoded_review = ' '.join([reverse_word_index.get(i - 3, '?') for i in train_data[0]])
 
 
-def vectorize_sequences(sequences, dimension=10000):
-    results = np.zeros((len(sequences), dimension))
-    for i, sequence in enumerate(sequences):
-        results[i, sequence] = 1
-        return results
+# def vectorize_sequences(sequences, dimension=10000):
+#     results = np.zeros((len(sequences), dimension))
+#     for i, sequence in enumerate(sequences):
+#         results[i, sequence] = 1
+#         return results
 
 
 # x_train = vectorize_sequences(train_data)
@@ -138,50 +138,73 @@ from keras.utils.np_utils import to_categorical
 # predictions = model.predict(x_test)
 # print(np.sum(predictions[0]))
 
-from keras.datasets import boston_housing
-(train_data, train_targets), (test_data, test_targets) = boston_housing.load_data()
+# from keras.datasets import boston_housing
+# (train_data, train_targets), (test_data, test_targets) = boston_housing.load_data()
+#
+# mean = train_data.mean(axis=0)
+# train_data -= mean
+# std = train_data.std(axis=0)
+# train_data /= std
+# test_data -= mean
+# test_data /= std
+#
+#
+# def build_model():
+#     model = models.Sequential()
+#     model.add(layers.Dense(64, activation='relu', input_shape=(train_data.shape[1],)))
+#     model.add(layers.Dense(64, activation='relu'))
+#     model.add(layers.Dense(1))
+#     model.compile(optimizer='rmsprop', loss='mse', metrics=['mae'])
+#     return model
+#
+#
+# k = 4
+# num_val_samples = len(train_data) // k
+# num_epochs = 100
+# all_mae_histories = []
+#
+# for i in range(k):
+#     print('processing fold #', i)
+#     val_data = train_data[i * num_val_samples: (i + 1) * num_val_samples]
+#     val_targets = train_targets[i * num_val_samples: (i + 1) * num_val_samples]
+#     partial_train_data = np.concatenate([train_data[:i * num_val_samples],
+#                                          train_data[(i + 1) * num_val_samples:]], axis=0)
+#     partial_train_targets = np.concatenate([train_targets[:i * num_val_samples],
+#                                             train_targets[(i + 1) * num_val_samples:]], axis=0)
+#     model = build_model()
+#     history = model.fit(partial_train_data, partial_train_targets, validation_data=(val_data, val_targets),
+#                         epochs=num_epochs, batch_size=1, verbose=0)
+#     mae_history = history.history['val_mae']
+#     all_mae_histories.append(mae_history)
+#
+#
+# average_mae_history = [np.mean([x[i] for x in all_mae_histories]) for i in range(num_epochs)]
+# # print(average_mae_history)
+#
+# plt.plot(range(1, len(average_mae_history) + 1), average_mae_history)
+# plt.xlabel('Epochs')
+# plt.ylabel('Validation MAE')
+# plt.show()
 
-mean = train_data.mean(axis=0)
-train_data -= mean
-std = train_data.std(axis=0)
-train_data /= std
-test_data -= mean
-test_data /= std
+model = models.Sequential()
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.Flatten())
+model.add(layers.Dense(64, activation='relu'))
+model.add(layers.Dense(10, activation='softmax'))
 
+(train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+train_images = train_images.reshape((60000, 28, 28, 1))
+train_images = train_images.astype('float32') / 255
+test_images = test_images.reshape((10000, 28, 28, 1))
+test_images = test_images.astype('float32') / 255
+train_labels = to_categorical(train_labels)
+test_labels = to_categorical(test_labels)
+model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+model.fit(train_images, train_labels, epochs=5, batch_size=64)
+test_loss, test_acc = model.evaluate(test_images, test_labels)
 
-def build_model():
-    model = models.Sequential()
-    model.add(layers.Dense(64, activation='relu', input_shape=(train_data.shape[1],)))
-    model.add(layers.Dense(64, activation='relu'))
-    model.add(layers.Dense(1))
-    model.compile(optimizer='rmsprop', loss='mse', metrics=['mae'])
-    return model
-
-
-k = 4
-num_val_samples = len(train_data) // k
-num_epochs = 100
-all_mae_histories = []
-
-for i in range(k):
-    print('processing fold #', i)
-    val_data = train_data[i * num_val_samples: (i + 1) * num_val_samples]
-    val_targets = train_targets[i * num_val_samples: (i + 1) * num_val_samples]
-    partial_train_data = np.concatenate([train_data[:i * num_val_samples],
-                                         train_data[(i + 1) * num_val_samples:]], axis=0)
-    partial_train_targets = np.concatenate([train_targets[:i * num_val_samples],
-                                            train_targets[(i + 1) * num_val_samples:]], axis=0)
-    model = build_model()
-    history = model.fit(partial_train_data, partial_train_targets, validation_data=(val_data, val_targets),
-                        epochs=num_epochs, batch_size=1, verbose=0)
-    mae_history = history.history['val_mae']
-    all_mae_histories.append(mae_history)
-
-
-average_mae_history = [np.mean([x[i] for x in all_mae_histories]) for i in range(num_epochs)]
-# print(average_mae_history)
-
-plt.plot(range(1, len(average_mae_history) + 1), average_mae_history)
-plt.xlabel('Epochs')
-plt.ylabel('Validation MAE')
-plt.show()
+print(test_acc)
