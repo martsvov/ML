@@ -20,7 +20,7 @@ import keras.backend.tensorflow_backend as ktf
 # print(tensorflow.__version__)
 
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 # config = tf.compat.v1.ConfigProto()
 # config.gpu_options.allow_growth = True
 # session = tf.compat.v1.Session(config=config)
