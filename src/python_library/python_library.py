@@ -3,7 +3,9 @@ import pandas as pd
 import numexpr
 # from pandas_datareader import data
 import matplotlib.pyplot as plt
-import seaborn as sns; sns.set()
+import seaborn as sns;
+
+sns.set()
 from datetime import datetime
 import re
 
@@ -326,7 +328,7 @@ plt.style.use('seaborn-whitegrid')
 # cb = plt.colorbar()
 # cb.set_label('count in bin')
 
-x = np.linspace(0, 10, 1000)
+# x = np.linspace(0, 10, 1000)
 # fig, ax = plt.subplots()
 # ax.plot(x, np.sin(x), '-b', label='Sine')
 # ax.plot(x, np.cos(x), '--r', label='Cosine')
@@ -337,23 +339,122 @@ x = np.linspace(0, 10, 1000)
 # lines = plt.plot(x, y)
 # plt.legend(lines[:2], ['first', 'second'])
 
-cities = pd.read_csv('../data/california_cities.csv')
+# cities = pd.read_csv('../data/california_cities.csv')
+#
+# lat, lon = cities['latd'], cities['longd']
+# population, area = cities['population_total'], cities['area_total_km2']
+#
+# plt.scatter(lon, lat, label=None, c=np.log10(population), cmap='viridis', s=area, linewidth=0, alpha=0.5)
+# plt.axis(aspect='equal')
+# plt.xlabel('longitude')
+# plt.ylabel('latitude')
+# plt.colorbar(label='log$_{10}$(population)')
+# plt.clim(3, 7)
+#
+# for area in [100, 300, 500]:
+#     plt.scatter([], [], c='k', alpha=0.3, s=area, label=str(area) + ' km$^2$')
+#
+# plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='City Area')
+# plt.title('California Cities: Area and Population')
+#
+# plt.show()
 
-lat, lon = cities['latd'], cities['longd']
-population, area = cities['population_total'], cities['area_total_km2']
+# plt.style.use('classic')
+# x = np.linspace(0, 10, 1000)
+# I = np.sin(x) * np.cos(x[:, np.newaxis])
+# plt.imshow(I)
+# plt.colorbar()
 
-plt.scatter(lon, lat, label=None, c=np.log10(population), cmap='viridis', s=area, linewidth=0, alpha=0.5)
-plt.axis(aspect='equal')
-plt.xlabel('longitude')
-plt.ylabel('latitude')
-plt.colorbar(label='log$_{10}$(population)')
-plt.clim(3, 7)
+# speckles = (np.random.random(I.shape) < 0.01)
+# I[speckles] = np.random.normal(0, 3, np.count_nonzero(speckles))
+# plt.figure(figsize=(10, 3.5))
+# plt.subplot(1, 2, 1)
+# plt.imshow(I, cmap='RdBu')
+# plt.colorbar()
+# plt.subplot(1, 2, 2)
+# plt.imshow(I, cmap='RdBu')
+# plt.colorbar(extend='both')
+# plt.clim(-1, 1)
 
-for area in [100, 300, 500]:
-    plt.scatter([], [], c='k', alpha=0.3, s=area, label=str(area) + ' km$^2$')
+from sklearn.datasets import load_digits
 
-plt.legend(scatterpoints=1, frameon=False, labelspacing=1, title='City Area')
-plt.title('California Cities: Area and Population')
+# digits = load_digits(n_class=6)
+# fig, ax = plt.subplots(8, 8, figsize=(6, 6))
+# for i, axi in enumerate(ax.flat):
+#     axi.imshow(digits.images[i], cmap='binary')
+#     axi.set(xticks=[], yticks=[])
 
-plt.show()
-print()
+# mean = [0, 0]
+# cov = [[1, 1], [1, 2]]
+# x, y = np.random.multivariate_normal(mean, cov, 3000).T
+#
+# fig = plt.figure(figsize=(6, 6))
+# grid = plt.GridSpec(4, 4, hspace=0.2, wspace=0.2)
+# main_ax = fig.add_subplot(grid[:-1, 1:])
+# y_hist = fig.add_subplot(grid[:-1, 0], xticklabels=[], sharey=main_ax)
+# x_hist = fig.add_subplot(grid[-1, 1:], yticklabels=[], sharex=main_ax)
+# main_ax.plot(x, y, 'ok', markersize=3, alpha=0.2)
+#
+# x_hist.hist(x, 40, histtype='stepfilled',
+#             orientation='vertical', color='gray')
+# x_hist.invert_yaxis()
+# y_hist.hist(y, 40, histtype='stepfilled',
+#             orientation='horizontal', color='gray')
+# y_hist.invert_xaxis()
+
+from mpl_toolkits import mplot3d
+
+# ax = plt.axes(projection='3d')
+# zline = np.linspace(0, 15, 1000)
+# xline = np.sin(zline)
+# yline = np.cos(zline)
+# ax.plot3D(xline, yline, zline, 'gray')
+#
+# zdata = 15 * np.random.random(100)
+# xdata = np.sin(zdata) + 0.1 * np.random.randn(100)
+# ydata = np.cos(zdata) + 0.1 * np.random.randn(100)
+# ax.scatter3D(xdata, ydata, zdata, c=zdata, cmap='Greens')
+
+
+# def f(x, y):
+#     return np.sin(np.sqrt(x ** 2 + y ** 2))
+#
+#
+# x = np.linspace(-6, 6, 30)
+# y = np.linspace(-6, 6, 30)
+# X, Y = np.meshgrid(x, y)
+# Z = f(X, Y)
+#
+# fig = plt.figure()
+# ax = plt.axes(projection='3d')
+# ax.contour3D(X, Y, Z, 50, cmap='binary')
+# ax.set_xlabel('x')
+# ax.set_ylabel('y')
+# ax.set_zlabel('z')
+
+import seaborn as sns
+
+sns.set()
+
+# rng = np.random.RandomState(0)
+# x = np.linspace(0, 10, 500)
+# y = np.cumsum(rng.randn(500, 6), 0)
+#
+# plt.plot(x, y)
+# plt.legend('ABCDEF', ncol=2, loc='upper left')
+
+# data = np.random.multivariate_normal([0, 0], [[5, 2], [2, 2]],
+#                                      size=2000)
+# data = pd.DataFrame(data, columns=['x', 'y'])
+# for col in 'xy':
+#     plt.hist(data[col], normed=True, alpha=0.5)
+
+# planets = sns.load_dataset('planets')
+# planets.head()
+#
+# with sns.axes_style('white'):
+#     g = sns.factorplot("year", data=planets, aspect=4.0, kind='count',
+#                        hue='method', order=range(2001, 2015))
+#     g.set_ylabels('Number of Planets Discovered')
+#
+# plt.show()
