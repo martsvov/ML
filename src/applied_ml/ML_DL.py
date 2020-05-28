@@ -143,19 +143,65 @@ from sklearn.preprocessing import StandardScaler
 # ])
 # rbf_kernel_svm_clf.fit(X, y)
 
+# from sklearn.tree import DecisionTreeClassifier
+# from sklearn.tree import export_graphviz
+#
+# iris = datasets.load_iris()
+# X = iris.data[:, 2:]
+# y = iris.target
+# tree_clf = DecisionTreeClassifier(max_depth=2)
+# tree_clf.fit(X, y)
+#
+# export_graphviz(
+#     tree_clf,
+#     out_file="iris_tree.dot",
+#     feature_names=iris.feature_names[2:],
+#     class_names=iris.target_names,
+#     rounded=True,
+#     filled=True)
+#
+# print(tree_clf.predict_proba([[5, 1.5]]))
+# print(tree_clf.predict([[5, 1.5]]))
+
+from sklearn.datasets import make_moons
+from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import VotingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+
+X, y = make_moons(n_samples=10000)
+
+n = 8000
+X_train, X_test, y_train, y_test = X[:n], X[n:], y[:n], y[n:]
+
+# log_clf = LogisticRegression()
+# rnd_clf = RandomForestClassifier()
+# svm_clf = SVC()
+# voting_clf = VotingClassifier(
+#     estimators=[('lr', log_clf), ('rf', rnd_clf), ('svc', svm_clf)],
+#     voting='hard')
+# voting_clf.fit(X_train, y_train)
+#
+# for clf in (log_clf, rnd_clf, svm_clf, voting_clf):
+#     clf.fit(X_train, y_train)
+#     y_pred = clf.predict(X_test)
+#     print(clf.__class__.__name__, accuracy_score(y_test, y_pred))
+
+from sklearn.ensemble import BaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import export_graphviz
+from sklearn.ensemble import AdaBoostClassifier
 
-iris = datasets.load_iris()
-X = iris.data[:, 2:]
-y = iris.target
-tree_clf = DecisionTreeClassifier(max_depth=2)
-tree_clf.fit(X, y)
+# bag_clf = BaggingClassifier(
+#     DecisionTreeClassifier(), n_estimators=500,
+#     max_samples=100, bootstrap=True, n_jobs=-1, oob_score=True)
+# bag_clf.fit(X_train, y_train)
+# y_pred = bag_clf.predict(X_test)
+#
+# print(y_pred)
+# print(bag_clf.oob_score_)
 
-export_graphviz(
-    tree_clf,
-    out_file="iris_tree.dot",
-    feature_names=iris.feature_names[2:],
-    class_names=iris.target_names,
-    rounded=True,
-    filled=True)
+ada_clf = AdaBoostClassifier(
+    DecisionTreeClassifier(max_depth=1), n_estimators=200,
+                           algorithm="SAMME.R", learning_rate=0.5)
+ada_clf.fit(X_train, y_train)
