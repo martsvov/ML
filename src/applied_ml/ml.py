@@ -10,7 +10,7 @@ from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_
     precision_recall_curve, roc_curve, roc_auc_score
 
 # mnist = fetch_openml('mnist_784')
-# Х, у = mnist["data"], mnist["target"]
+# X, y = mnist["data"], mnist["target"]
 
 # some_digit = Х[36000]
 # some_digit_image = some_digit.reshape(28, 28)
@@ -18,7 +18,7 @@ from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_
 # plt.axis("off")
 # plt.show()
 
-# X_train, X_test, y_train, y_test = Х[:60000], Х[60000:], у[:60000], у[60000:]
+# X_train, X_test, y_train, y_test = X[:60000], X[60000:], y[:60000], y[60000:]
 # shuffle_index = np.random.permutation(60000)
 # X_train, y_train = X_train[shuffle_index], y_train[shuffle_index]
 #
@@ -170,10 +170,10 @@ from sklearn.ensemble import VotingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 
-X, y = make_moons(n_samples=10000)
-
-n = 8000
-X_train, X_test, y_train, y_test = X[:n], X[n:], y[:n], y[n:]
+# X, y = make_moons(n_samples=10000)
+#
+# n = 8000
+# X_train, X_test, y_train, y_test = X[:n], X[n:], y[:n], y[n:]
 
 # log_clf = LogisticRegression()
 # rnd_clf = RandomForestClassifier()
@@ -191,6 +191,7 @@ X_train, X_test, y_train, y_test = X[:n], X[n:], y[:n], y[n:]
 from sklearn.ensemble import BaggingClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import GradientBoostingRegressor
 
 # bag_clf = BaggingClassifier(
 #     DecisionTreeClassifier(), n_estimators=500,
@@ -201,7 +202,41 @@ from sklearn.ensemble import AdaBoostClassifier
 # print(y_pred)
 # print(bag_clf.oob_score_)
 
-ada_clf = AdaBoostClassifier(
-    DecisionTreeClassifier(max_depth=1), n_estimators=200,
-                           algorithm="SAMME.R", learning_rate=0.5)
-ada_clf.fit(X_train, y_train)
+# ada_clf = AdaBoostClassifier(
+#     DecisionTreeClassifier(max_depth=1), n_estimators=200,
+#                            algorithm="SAMME.R", learning_rate=0.5)
+# ada_clf.fit(X_train, y_train)
+
+# gbrt = GradientBoostingRegressor(max_depth=2, n_estimators=3, learning_rate=1.0)
+# gbrt.fit(X, y)
+
+# a = 2 * np.random.rand(50, 1)
+# b = 4 + 3 * a + np.random.randn(50, 1)
+#
+# X = np.array([a, b])
+# X = X.reshape(50, 2)
+# X_centered = X - X.mean(axis=0)
+# U, S, Vt = np.linalg.svd(X_centered)
+# c1 = Vt.T[:, 0]
+# c2 = Vt.T[:, 1]
+# W2 = Vt.T[:, :1]
+# X2D = X_centered.dot(W2)
+#
+# plt.scatter(a, b)
+# plt.scatter(X2D, np.ones(50))
+# plt.show()
+
+# from sklearn.decomposition import PCA
+#
+# pca = PCA(n_components=2)
+# X2D = pca.fit_transform(X)
+
+# from sklearn.decomposition import KernelPCA
+#
+# rbf_pca = KernelPCA(n_components=2, kernel="rbf", gamma=0.04)
+# X_reduced = rbf_pca.fit_transform(X)
+
+# from sklearn.manifold import LocallyLinearEmbedding
+#
+# lle = LocallyLinearEmbedding(n_components=2, n_neighbors=10)
+# X_reduced = lle.fit_transform(X)
